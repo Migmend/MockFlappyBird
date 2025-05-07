@@ -1,5 +1,4 @@
 //board
-
 let board;
 let boardWidth = 360;
 let boardHeight = 640;
@@ -20,7 +19,6 @@ let bird = {
 };
 
 //pipes
-
 let pipeArr = [];
 let pipeWidth = 64;
 let pipeHeight = 512;
@@ -29,6 +27,9 @@ let pipeY = 0;
 
 let topPipImg;
 let bottomPipeImg;
+
+//physics
+let velocityX = -2;
 
 window.onload = function () {
   board = document.getElementById("board");
@@ -42,7 +43,6 @@ window.onload = function () {
   //   context.fillRect(bird.x, bird.y, bird.width, bird.height);
 
   //load images
-
   birdImg = new Image();
   birdImg.src = "./images/flappybird.png";
   birdImg.onload = function () {
@@ -65,25 +65,40 @@ function update() {
   context.clearRect(0, 0, board.width, board.height);
 
   //bird
-
   context.drawImage(birdImg, bird.x, bird.y, bird.width, bird.height);
 
   //pipes
   for (let i = 0; i < pipeArr.length; i++) {
     let pipe = pipeArr[i];
+    pipe.x += velocityX;
     context.drawImage(pipe.img, pipe.x, pipe.y, pipe.width, pipe.height);
   }
 }
 
 function placePipes() {
+  //0-1) * pipeHeight/2
+  //0 -> -128 (pipeHeight/4)
+  //1 -> -128 - 256 (pipeHeight/4 - pipeHeight/2) = -3/4 pipeHeight
+  let randomPipeY = pipeY - pipeHeight / 4 - Math.random() * (pipeHeight / 2);
+  let openingSpace = board.height / 4;
+
   let topPipe = {
     img: topPipImg,
     x: pipeX,
-    y: pipeY,
+    y: randomPipeY,
     width: pipeWidth,
     height: pipeHeight,
     passed: false,
   };
-
   pipeArr.push(topPipe);
+
+  let bottomPipe = {
+    img: bottomPipeImg,
+    x: pipeX,
+    y: randomPipeY + pipeHeight + openingSpace,
+    width: pipeWidth,
+    height: pipeHeight,
+    passed: false,
+  };
+  pipeArr.push(bottomPipe);
 }
